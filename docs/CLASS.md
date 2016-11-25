@@ -7,24 +7,24 @@
 
 ## methods
 1. setPath  
-> Set the log file path  
+    Set the log file path  
 2. getPath  
-> Get the log file path  
+    Get the log file path  
 3. setChannel  
-> Set a channel for logger  
+    Set a channel for logger  
 4. getChannel  
-> Get the channel  
+    Get the channel  
 5. emergency  
-> Log an emergency log  
+    Log an emergency log  
 6. alert  
-> Log a alert level log  
+    Log a alert level log  
 7. critical  
-> Log a critical level log  
+    Log a critical level log  
 8. error  
-> Log an error level log  
+    Log an error level log  
 9. warning  
-> Log an warning level log  
+    Log an warning level log  
 10. info  
-> Log a info level log  
+    Log a info level log  
 11. debug  
-> Log a debug level log  
+    Log a debug level log  
