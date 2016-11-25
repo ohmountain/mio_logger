@@ -1,9 +1,9 @@
 # MioLogger
 
 ## static variables
-1. OPEN\_FAILURE   Could not open the log file
-2. WRITE\_FAILURE  Could not write the log file
-3. WRITE\_SUCCESS   Write log success
+1. **OPEN\_FAILURE**   value: -2, Could not open the log file
+2. **WRITE\_FAILURE**  value: -1, Could not write the log file
+3. **WRITE\_SUCCESS**  value:  0, Write log success
 
 ## methods
 1. setPath          Set the log file path
