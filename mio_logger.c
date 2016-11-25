@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author:                                                              |
+  | Author: renshan <1005110700@qq.com>		                             |
   +----------------------------------------------------------------------+
 */
 
@@ -407,6 +407,7 @@ PHP_MINFO_FUNCTION(mio_logger)
 {
 	php_info_print_table_start();
 	php_info_print_table_header(2, "mio_logger support", "enabled");
+	php_info_print_table_row(2, "mio_logger version", "1.0.0");
 	php_info_print_table_end();
 
 	/* Remove comments if you have entries in php.ini
