@@ -6,8 +6,8 @@
 
 $mio_log = new MioLogger("mio", "path_to.log");
 
-$channel = $mio_log->getChannel() // "mio";
-$path = $mio_log->getPath(); // "path_go.log";
+$channel = $mio_log->getChannel()   // "mio";
+$path = $mio_log->getPath();        // "path_to.log";
 
 $mio_log->setChannel("amaze");
 $mio_log->setPath("/home/you_home/amaze.log");
