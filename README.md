@@ -23,6 +23,6 @@ $mio_log->debug("Oh No");       // write log with debug level
 ```
 
 ## Return value
-1. -2   can't open or crate the log file
+1. -2   can't open or create the log file
 2. -1   can't write log
 3. 0    success
