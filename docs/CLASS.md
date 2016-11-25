@@ -3,7 +3,7 @@
 ## static variables
 1. **OPEN\_FAILURE**   value: -2, Could not open the log file
 2. **WRITE\_FAILURE**  value: -1, Could not write the log file
-3. **WRITE\_SUCCESS**  value:  0, Write log success
+3. **LOG\_SUCCESS**    value:  0, Write log success
 
 ## methods
 1. **setPath**  

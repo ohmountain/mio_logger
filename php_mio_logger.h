@@ -57,9 +57,37 @@ ZEND_END_MODULE_GLOBALS(mio_logger)
 #if defined(ZTS) && defined(COMPILE_DL_MIO_LOGGER)
 ZEND_TSRMLS_CACHE_EXTERN()
 #endif
+	
+/*
+ *	Define the reteurn value
+*/
+#define OPEN_FAILURE	-2
+#define WRITE_FAILURE	-1
+#define LOG_SUCCESS		0
+
+/*
+ *	Define Log Level
+*/
+#define MIO_EMERGENCY	"EMERGENCY"
+#define MIO_ALERT		"ALERT"
+#define MIO_CRITICAL	"CRITICAL"
+#define MIO_ERROR		"ERROR"
+#define MIO_WARNING		"WARNING"
+#define MIO_INFO		"INFO"
+#define MIO_DEBUG		"DEBUG"
+
+/*
+ *	Define line feed
+*/
+#ifdef PHP_WIN32
+#define LINE_FEED "\r\n"
+#else
+#define LINE_FEED "\n"
+#endif
+
+
 
 #endif	/* PHP_MIO_LOGGER_H */
-
 
 /*
  * Local variables:

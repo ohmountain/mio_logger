@@ -13,9 +13,9 @@ dnl [  --with-mio_logger             Include mio_logger support])
 
 dnl Otherwise use enable:
 
-dnl PHP_ARG_ENABLE(mio_logger, whether to enable mio_logger support,
-dnl Make sure that the comment is aligned:
-dnl [  --enable-mio_logger           Enable mio_logger support])
+PHP_ARG_ENABLE(mio_logger, whether to enable mio_logger support,
+Make sure that the comment is aligned:
+[  --enable-mio_logger           Enable mio_logger support])
 
 if test "$PHP_MIO_LOGGER" != "no"; then
   dnl Write more examples of tests here...

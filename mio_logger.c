@@ -26,13 +26,17 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_mio_logger.h"
+#include "mio_logger_funcs.h"
 
 /* If you declare any globals in php_mio_logger.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(mio_logger)
 */
 
 /* True global resources - no need for thread safety here */
-static int le_mio_logger;
+static int ce_mio_logger;
+
+zend_class_entry *mio_logger_ce;
+
 
 /* {{{ PHP_INI
  */
@@ -44,34 +48,226 @@ PHP_INI_END()
 */
 /* }}} */
 
-/* Remove the following function when you have successfully modified config.m4
-   so that your module can be compiled into PHP, it exists only for testing
-   purposes. */
-
-/* Every user-visible function in PHP should document itself in the source */
-/* {{{ proto string confirm_mio_logger_compiled(string arg)
-   Return a string to confirm that the module is compiled in */
-PHP_FUNCTION(confirm_mio_logger_compiled)
+/* {{{ Construct of MioLogger */
+ZEND_METHOD(mio_logger, __construct)
 {
-	char *arg = NULL;
-	size_t arg_len, len;
-	zend_string *strg;
+	char *channel,
+		 *path;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arg, &arg_len) == FAILURE) {
+	size_t c_len,
+		   p_len;
+
+
+	/** | means parameters after are optional **/
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|ss", &channel, &c_len, &path, &p_len) == FAILURE) {
 		return;
 	}
 
-	strg = strpprintf(0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "mio_logger", arg);
+	/* Set path, if get channel from __construct */
+	if (strlen(channel) > 1) {
+		zend_update_property_string(mio_logger_ce, getThis(), "channel", 7, channel TSRMLS_CC);
+	}
 
-	RETURN_STR(strg);
+	/* Set path, if get path from __construct  */
+	if (strlen(path) > 1) {
+		zend_update_property_string(mio_logger_ce, getThis(), "path", 4, path TSRMLS_CC);
+	}
+
 }
 /* }}} */
-/* The previous line is meant for vim and emacs, so it can correctly fold and
-   unfold functions in source code. See the corresponding marks just before
-   function definition, where the functions purpose is also documented. Please
-   follow this convention for the convenience of others editing your code.
-*/
 
+
+/* {{{ setPath of MioLogger */
+ZEND_METHOD(mio_logger, setPath)
+{
+	char *path;
+	size_t p_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &path, &p_len) == FAILURE) {
+		return;
+	}
+
+	if (strlen(path) > 1) {
+		zend_update_property_stringl(mio_logger_ce, getThis(), "path", 4, path, strlen(path));
+	}
+}
+/* }}} */
+
+/* {{{ getPath of MioLogger */
+ZEND_METHOD(mio_logger, getPath)
+{
+
+	zval *rv;
+	zval *path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+
+	RETURN_STR(strpprintf(0, "%s", path->value.str->val));
+}
+/* }}} */
+
+/* {{{ getChannel of MioLogger */
+ZEND_METHOD(mio_logger, setChannel)
+{
+	char *channel;
+	size_t c_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &channel, &c_len) == FAILURE) {
+		return;
+	}
+
+	if (strlen(channel) > 1) {
+		zend_update_property_stringl(mio_logger_ce, getThis(), "channel", 7, channel, strlen(channel));
+	}
+}
+/* }}} */
+
+/* {{{ getChannel of MioLogger */
+ZEND_METHOD(mio_logger, getChannel)
+{
+
+	zval *rv;
+	zval *channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	RETURN_STR(strpprintf(0, "%s", channel->value.str->val));
+}
+/* }}} */
+
+/*{{{ Method emergency */
+ZEND_METHOD(mio_logger, emergency)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_EMERGENCY, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
+/*{{{ Method alert */
+ZEND_METHOD(mio_logger, alert)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_ALERT, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
+/*{{{ Method emergency */
+ZEND_METHOD(mio_logger, critical)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_CRITICAL, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
+/*{{{ Method error */
+ZEND_METHOD(mio_logger, error)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_ERROR, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
+/*{{{ Method info */
+ZEND_METHOD(mio_logger, info)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_INFO, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
+/*{{{ Method debug */
+ZEND_METHOD(mio_logger, debug)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_DEBUG, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
 
 /* {{{ php_mio_logger_init_globals
  */
@@ -84,6 +280,30 @@ static void php_mio_logger_init_globals(zend_mio_logger_globals *mio_logger_glob
 */
 /* }}} */
 
+/* {{{ mio_logger_functions[]
+ *
+ * Every user visible function must have an entry in mio_logger_functions[].
+ */
+const zend_function_entry mio_logger_functions[] = {
+	//PHP_FE(confirm_mio_logger_compiled,	NULL)		/* For testing, remove later. */
+	//PHP_FE(mio_log,	NULL)		/* For testing, remove later. */
+	//PHP_FE_END	/* Must be the last line in mio_logger_functions[] */
+	
+	ZEND_ME(mio_logger, __construct, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, setChannel, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, getChannel, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, setPath, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, getPath, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, emergency, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, alert, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, critical, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, error, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, info, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, debug, NULL, ZEND_ACC_PUBLIC)
+	PHP_FE_END	/* Must be the last line in mio_logger_functions[] */
+};
+/* }}} */
+
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(mio_logger)
@@ -91,6 +311,36 @@ PHP_MINIT_FUNCTION(mio_logger)
 	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
+
+	zend_class_entry ce;
+	INIT_CLASS_ENTRY(ce, "MioLogger", mio_logger_functions);
+	mio_logger_ce = zend_register_internal_class(&ce TSRMLS_CC);
+
+	/* 
+	Define const variable for  MioLogger 
+	*/
+	/* Level Critical */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_EMERGENCY, strlen(MIO_EMERGENCY), MIO_EMERGENCY, strlen(MIO_EMERGENCY) TSRMLS_DC);
+	/* Level Alert */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_ALERT, strlen(MIO_ALERT), MIO_ALERT, strlen(MIO_ALERT) TSRMLS_DC);
+	/* Level Critical */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_CRITICAL, strlen(MIO_CRITICAL), MIO_CRITICAL, strlen(MIO_CRITICAL) TSRMLS_DC);
+	/* Level Error */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_ERROR, strlen(MIO_ERROR), MIO_ERROR, strlen(MIO_ERROR) TSRMLS_DC);
+	/* Level Warning */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_WARNING, strlen(MIO_WARNING), MIO_WARNING, strlen(MIO_WARNING) TSRMLS_DC);
+	/* Level Info */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_INFO, strlen(MIO_INFO), MIO_INFO, strlen(MIO_INFO) TSRMLS_DC);
+	/* Level Debug */
+	zend_declare_class_constant_stringl(mio_logger_ce, MIO_DEBUG, strlen(MIO_DEBUG), MIO_DEBUG, strlen(MIO_DEBUG) TSRMLS_DC);
+
+	
+	/*
+	Define the path and channel variable
+	*/
+	zend_declare_property_null(mio_logger_ce, "channel", 7, ZEND_ACC_PRIVATE TSRMLS_DC);
+	zend_declare_property_null(mio_logger_ce, "path", 4, ZEND_ACC_PRIVATE TSRMLS_DC);
+
 	return SUCCESS;
 }
 /* }}} */
@@ -141,15 +391,6 @@ PHP_MINFO_FUNCTION(mio_logger)
 }
 /* }}} */
 
-/* {{{ mio_logger_functions[]
- *
- * Every user visible function must have an entry in mio_logger_functions[].
- */
-const zend_function_entry mio_logger_functions[] = {
-	PHP_FE(confirm_mio_logger_compiled,	NULL)		/* For testing, remove later. */
-	PHP_FE_END	/* Must be the last line in mio_logger_functions[] */
-};
-/* }}} */
 
 /* {{{ mio_logger_module_entry
  */
