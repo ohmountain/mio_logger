@@ -223,6 +223,29 @@ ZEND_METHOD(mio_logger, error)
 }
 /* }}} */
 
+/*{{{ Method notice */
+ZEND_METHOD(mio_logger, notice)
+{
+	char *log_content;
+	size_t len;
+	zval *rv;
+	zval *path;
+	zval *channel;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &log_content, &len) == FAILURE) {
+		return;
+	}
+
+	path = zend_read_property(mio_logger_ce, getThis(), "path", 4, 1, rv);
+	channel = zend_read_property(mio_logger_ce, getThis(), "channel", 7, 1, rv);
+
+	int ret = write_log(path->value.str->val, channel->value.str->val, MIO_NOTICE, log_content);
+
+	RETURN_LONG(ret);
+
+}
+/* }}} */
+
 /*{{{ Method warning */
 ZEND_METHOD(mio_logger, warning)
 {
@@ -321,6 +344,7 @@ const zend_function_entry mio_logger_functions[] = {
 	ZEND_ME(mio_logger, alert, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(mio_logger, critical, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(mio_logger, error, NULL, ZEND_ACC_PUBLIC)
+	ZEND_ME(mio_logger, notice, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(mio_logger, warning, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(mio_logger, info, NULL, ZEND_ACC_PUBLIC)
 	ZEND_ME(mio_logger, debug, NULL, ZEND_ACC_PUBLIC)

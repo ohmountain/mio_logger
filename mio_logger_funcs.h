@@ -25,7 +25,7 @@ int write_log(const char *log_file, const char *channel, const char *level, cons
     timeinfo = localtime(&rawtime);
 
     char time_str[255] = {};
-    sprintf(time_str, "[%4d-%2d-%2d %2d:%2d:%2d]", 
+    sprintf(time_str, "[%4d-%02d-%02d %02d:%02d:%02d]", 
             1900 + timeinfo->tm_year, 
             1 + timeinfo->tm_mon,
             timeinfo->tm_mday,
@@ -38,7 +38,7 @@ int write_log(const char *log_file, const char *channel, const char *level, cons
     log_len = strlen(log_content);
     time_len = strlen(time_str);
 
-    char *str_buf = (char *)malloc(time_len + 1 + channel_len + 1 + level_len + 1 + log_len + 2);
+    char *str_buf = (char *)malloc(time_len + 1 + channel_len + 1 + level_len + 1 + log_len + 3);
 
     /** Open file **/
     if ((fd = fopen(log_file, "ab+")) == NULL) {
@@ -61,6 +61,7 @@ int write_log(const char *log_file, const char *channel, const char *level, cons
         *(str_buf + i) = *(level + j);
     }
  
+    *(str_buf + i++) = ':';
     *(str_buf + i++) = '\t';
 
     for (j=0; j<strlen(log_content); i++, j++) {
